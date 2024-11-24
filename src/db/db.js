@@ -1,17 +1,11 @@
-const mysql = require("mysql");
+const mysql = require("mysql2");
 const dbConfig = require("./db_config.json");
+const {query} = require("express");
 
 const pool = mysql.createPool(dbConfig);
 
-function getConnection(callback) {
-    pool.getConnection(function(err, connection) {
-        console.log(JSON.stringify(err))
-        if (!err) {
-            callback(connection);
-        } else {
-            console.log(`db error: ${err.message}`)
-        }
-    })
+async function getConnection() {
+    return pool.promise().getConnection();
 }
 
 module.exports = getConnection;
