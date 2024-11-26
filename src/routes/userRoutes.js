@@ -109,6 +109,7 @@ router.post("/logout", async (req, res) => {
     }
 });
 
+// 유저 정보 조회
 router.get("/:id", async (req, res) => {
     const connection = await getConnection();
     const id = req.params.id;
@@ -117,7 +118,6 @@ router.get("/:id", async (req, res) => {
         const selectQuery = "SELECT * FROM user WHERE id = ?"
 
         const [selectRows, selectFields] = await connection.query(selectQuery, [id])
-
         if (getValidObject(selectRows).length !== 0) {
             const userInfo = {
                 rowId: selectRows[0].rowId,
@@ -139,15 +139,16 @@ router.get("/:id", async (req, res) => {
     }
 });
 
+// 유저 정보 수정
 router.put("/", async (req, res) => {
     const connection = await getConnection();
 
     const { rowId, id, nickname, reviewIdList } = req.body;
 
     try {
-        const updateQuery = "UPDATE user SET `id` = ?, `nickname` = ? WHERE `rowId` = ?"
+        const updateQuery = "UPDATE user SET `id` = ?, `nickname` = ?, `reviewIdList` = ? WHERE `rowId` = ?"
 
-        const [result, updateFields] = await connection.query(updateQuery, [id, nickname, rowId]);
+        const [result, updateFields] = await connection.query(updateQuery, [id, nickname, JSON.stringify(reviewIdList), rowId]);
 
         if (result.affectedRows > 0) {
             req.session.user = {
@@ -166,6 +167,7 @@ router.put("/", async (req, res) => {
     }
 })
 
+// 유저 탈퇴
 router.delete("/:id", async (req, res) => {
     const connection = await getConnection();
     const id = req.params.id;

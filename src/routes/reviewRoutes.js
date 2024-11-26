@@ -6,6 +6,7 @@ const app = express();
 
 app.use(router);
 
+// 리뷰 업로드
 router.post("/", async (req, res) => {
     // id는 오토
     const { storeName, author, review, starCount } = req.body;
@@ -34,6 +35,8 @@ router.post("/", async (req, res) => {
         connection.release();
     }
 })
+
+// 리뷰 리스트 받아오기 (reviewIdList 길어질 때 대비해 post 사용)
 router.post("/list", async (req, res) => {
     const connection = await getConnection();
 
@@ -72,26 +75,6 @@ router.post("/list", async (req, res) => {
         connection.release();
     }
 });
-router.put("/", async(req, res) => {
-    const connection = await getConnection();
-
-    try {
-        const { id, storeName, author, review, starCount } = req.body;
-        const updateQuery = "UPDATE review SET `storeName` = ?, `author` = ?, `review` = ?, `starCount` = ? WHERE id = ?";
-        const [result, updateFields] = await connection.query(updateQuery, [storeName, author, review, starCount, id]);
-
-        if (result.affectedRows > 0) {
-            res.status(200).json({ isSuccess: true, message: "리뷰가 수정되었습니다." })
-        } else {
-            res.status(400).json({ isSuccess: false, message: "리뷰 수정에 실패했습니다. 다시 시도해주세요." })
-        }
-    } catch(error) {
-        console.log(`PutReview Error: ${error.message}`)
-        res.status(500).json({ isSuccess: false, message: "서버 에러가 발생했습니다." })
-    } finally {
-        connection.release();
-    }
-})
 
 function getValidObject(object) {
     return JSON.parse(JSON.stringify(object));
